@@ -581,7 +581,6 @@ export class {{.Config.ClassName}} {
 		{{- if eq $argument.In "body" -}}{{ $argument.Name }}: {{$body = true}}{{ getTypeFromNamespace $argument.Type }}{{- end -}}
 	{{- end -}}
   ): Observable<{{- if ne $output "" }}{{ getTypeFromNamespace $output }}{{- else}}any{{- end}}> {
-    const urlPath = {{ $methodData.EndpointPath | convertPathToJs -}};
     let params = new HttpParams();
 	{{- range $argument := $methodData.Arguments -}}
 	{{if eq $argument.In "query"}}
@@ -591,8 +590,12 @@ export class {{.Config.ClassName}} {
       {{- else -}}
       params = params.set('{{$argument.Name}}', {{if eq $argument.Type "string" -}} {{$argument.Name}}{{else}}String({{$argument.Name}}){{- end}});
       {{- end}}
-    }{{ end }}
+    }
+  {{- else if eq $argument.In "path"}}
+    {{$argument.Name}} = encodeURIComponent({{$argument.Name}});
+  {{- end }}
 	{{- end }}
+    const urlPath = {{ $methodData.EndpointPath | convertPathToJs -}};
     return this.httpClient.{{ $methodData.HttpMethod }}{{- if ne $output ""}}<{{ getTypeFromNamespace $output }}>{{- end}}(this.config.host + urlPath{{- if eq $body true}}, body{{- end}}, { params: params{{- if ne $authFunction "" }}, headers: this.{{$authFunction}}{{- end}} })
   }
 {{- end }}
