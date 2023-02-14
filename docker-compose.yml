@@ -13,12 +13,12 @@ services:
       - "26257:26257"
       - "8080:8080"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health?ready=1" ]
-      interval: 10s
-      timeout: 5s
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 3s
+      timeout: 3s
       retries: 5
   nakama:
-    image: heroiclabs/nakama:3.11.0
+    image: registry.heroiclabs.com/heroiclabs/nakama:3.15.0
     entrypoint:
       - "/bin/sh"
       - "-ecx"
